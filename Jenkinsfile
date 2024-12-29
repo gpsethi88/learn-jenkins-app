@@ -19,6 +19,7 @@ pipeline {
                     ls -la
                 '''
             }
+        }
         stage('Test') {
             agent {
                 docker {
@@ -32,7 +33,6 @@ pipeline {
                     npm test
                 '''
             }
-        }
         }
     }
 }
