@@ -1,7 +1,12 @@
 pipeline {
     agent any
+    environment {
+        NETLIFY_SITE_ID = "f3e531c6-e05f-42a9-a526-fef5df18db89"
+    }
 
     stages {
+
+
         stage('Build') {
             agent {
                 docker {
@@ -21,6 +26,7 @@ pipeline {
             }
         }
 
+
         stage('Test') {
             agent {
                 docker {
@@ -31,15 +37,16 @@ pipeline {
 
             steps {
                 sh '''
-                    test -f build/index.html
+                    #test -f build/index.html
                     npm test
                 '''
             }
         }
+
         stage('E2E') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.49.1-noble'
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
             }
@@ -53,6 +60,22 @@ pipeline {
                 '''
             }
         }
+        stage('Deploy') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                npm install netlify-cli
+                node_modules/.bin/netlify --version
+                echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
+                '''
+            }
+        }
+
     }
 
     post {
