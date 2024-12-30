@@ -7,7 +7,6 @@ pipeline {
 
     stages {
 
-
         stage('Build') {
             agent {
                 docker {
@@ -46,7 +45,6 @@ pipeline {
                         '''
                     }
                 }
-            }
                 stage('E2E') {
                     agent {
                         docker {
@@ -70,6 +68,9 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+            
         stage('Deploy') {
             agent {
                 docker {
@@ -86,6 +87,8 @@ pipeline {
                 node_modules/.bin/netlify deploy --dir=build --prod
                 '''
             }
+        }
+
         stage('Prod E2E') {
             environment {
                 CI_ENVIRONMENT_URL = 'https://superb-tulumba-17e926.netlify.app'
@@ -102,13 +105,12 @@ pipeline {
                     npx playwright test --reporter=html
                 '''
             }
-        }
-        post {
-            always {
-                junit 'jest-results/junit.xml'
-                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E Report', reportTitles: '', useWrapperFileDirectly: true])
+            post {
+                always {
+                    junit 'jest-results/junit.xml'
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E Report', reportTitles: '', useWrapperFileDirectly: true])
+                }
             }
         }
-    }
     }
 }
