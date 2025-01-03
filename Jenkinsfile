@@ -3,6 +3,7 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = "f3e531c6-e05f-42a9-a526-fef5df18db89"
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+        REACT_APP_VERSION = "1.0.$BUILD_ID"
     }
 
     stages {
@@ -97,13 +98,6 @@ pipeline {
                 always {
                     junit 'jest-results/junit.xml'
                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Staging E2E Report', reportTitles: '', useWrapperFileDirectly: true])
-                }
-            }
-        }
-        stage('Approval') {
-            steps {
-                timeout(activity: true, time: 120, unit: 'SECONDS') {
-                    input 'Ready to Deploy?'
                 }
             }
         }
