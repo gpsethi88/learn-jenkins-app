@@ -79,25 +79,22 @@ pipeline {
             }
             steps {
                 sh '''
-                npm install netlify-cli
+                npm install netlify-cli node-jq
                 node_modules/.bin/netlify --version
                 node_modules/.bin/netlify status
                 echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                node_modules/.bin/netlify deploy --dir=build
+                node_modules/.bin/netlify deploy --dir=build --json
                 '''
             }
         }
 
         stage('Approval') {
             steps {
-                timeout(activity: true, time: 10, unit: 'SECONDS') {
+                timeout(activity: true, time: 120, unit: 'SECONDS') {
                     input 'Ready to Deploy?'
                 }
             }
         }
-        
-        
-
 
         stage('Deploy Prod') {
             agent {
